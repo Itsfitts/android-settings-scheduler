@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">Settings Scheduler</string>
+
+    <string name="permissions_title">Permissions</string>
+    <string name="shizuku_title">Shizuku</string>
+    <string name="shizuku_not_installed">Shizuku is not installed</string>
+    <string name="shizuku_not_installed_description">Shizuku is not installed, install from the Play Store?</string>
+    <string name="shizuku_not_running">Shizuku is not running</string>
+    <string name="shizuku_permission_denied">Shizuku permission is denied</string>
+    <string name="shizuku_running">Shizuku permission is granted</string>
+
+    <string name="secure_settings_permission">Secure Settings Permission</string>
+    <string name="secure_settings_permission_granted">Secure Settings Permission Granted</string>
+    <string name="secure_settings_permission_denied">Secure Settings Permission Denied</string>
+
+    <string name="charging_mode">Default Charging Mode</string>
+    <string name="charging_mode_warning">Selecting a default will apply it immediately</string>
+    <string name="adaptive_charging_enabled">Adaptive Charging</string>
+    <string name="charge_optimization_mode">Limited to 80%</string>
+    <string name="adaptive_charging_enabled_description">Finish charging to 100% right before you normally unplug</string>
+    <string name="charge_optimization_mode_description">Stop charging when the battery is 80% charged</string>
+    <string name="unknown">Unknown</string>
+
+    <string name="schedule">Schedule</string>
+    <string name="schedule_title">Set \"%1$s\" on these days</string>
+
+    <string name="recorder_title">Settings recorder</string>
+    <string name="recorder_description">Record any changes to the settings</string>
+
+    <string name="new_mode">Create a new mode</string>
+    <string name="actions_title">Actions</string>
+    <string name="trigger_title">Trigger</string>
+    <string name="icon_title">Icon</string>
+    <string name="modes_title">Modes</string>
+</resources>
