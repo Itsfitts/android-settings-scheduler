@@ -4,7 +4,7 @@ Schedule any settings that are in the Android Settings app.
 
 ### Credits
 
-The Shizuku and permissions part of this app is adapted from [SimpleAppProjects/SimpleWear](https://github.com/SimpleAppProjects/SimpleWear) by [thewizrd](https://github.com/thewizrd)
+The Shizuku and permissions part of this app is adapted from [SimpleAppProjects/SimpleWear](https://github.com/SimpleAppProjects/SimpleWear) by [thewizrd](https://github.com/thewizrd) and [MuntashirAkon/AppManager](https://github.com/MuntashirAkon/AppManager)
 
 ## Overview
 
