@@ -46,7 +46,7 @@ fun Pair<Int, Int>.toMinutesSinceMidnight(): Int {
 
 @Entity(tableName = "modes")
 data class ModeEntity(
-    @PrimaryKey val id: String = "",
+    @PrimaryKey(autoGenerate = true) val id: Int = 0, // Auto-generated ID
     val name: String,
     val iconName: String? = null,
     val settings: List<SettingEntity>, // Store settings as JSON string
@@ -58,7 +58,7 @@ data class ModeEntity(
 @Entity(tableName = "settings")
 data class SettingEntity(
     @PrimaryKey val id: String,
-    val modeId: String,
+    val modeId: Int,
     val key: String,
     val value: String,
     val namespace: String,

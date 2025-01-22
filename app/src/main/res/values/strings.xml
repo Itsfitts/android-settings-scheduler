@@ -13,7 +13,7 @@
     <string name="secure_settings_permission_granted">Secure Settings Permission Granted</string>
     <string name="secure_settings_permission_denied">Secure Settings Permission Denied</string>
 
-    <string name="charging_mode">Default Charging Mode</string>
+    <string name="charging_mode">Charging Mode</string>
     <string name="charging_mode_warning">Selecting a default will apply it immediately</string>
     <string name="adaptive_charging_enabled">Adaptive Charging</string>
     <string name="charge_optimization_mode">Limited to 80%</string>

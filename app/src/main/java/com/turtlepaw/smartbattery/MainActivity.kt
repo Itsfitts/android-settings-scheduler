@@ -9,6 +9,12 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -63,6 +69,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.navigation.NavBackStackEntry
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
@@ -70,6 +77,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkQuery
 import com.ramcosta.composedestinations.DestinationsNavHost
+import com.ramcosta.composedestinations.animations.NavHostAnimatedDestinationStyle
 import com.ramcosta.composedestinations.animations.defaults.DefaultFadingTransitions
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.NavHostGraph
@@ -97,8 +105,19 @@ import java.util.Calendar
 import java.util.Locale
 import kotlin.reflect.KProperty
 
+object FadingTransitions: NavHostAnimatedDestinationStyle() {
+    override val enterTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
+        fadeIn(animationSpec = tween(400))
+    }
+
+    override val exitTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
+        fadeOut(animationSpec = tween(400))
+    }
+}
+
+
 @NavHostGraph(
-    defaultTransitions = DefaultFadingTransitions::class,
+    defaultTransitions = FadingTransitions::class,
     route = "preferred_route",
     visibility = CodeGenVisibility.PUBLIC,
 )
@@ -491,42 +510,42 @@ fun HomePage(navigator: DestinationsNavigator) {
                 }
             )
 
-            Box(
-                modifier = Modifier.clickable {
-                    // enqueue temp task to test
-                    val workManager = WorkManager.getInstance(context)
-                    workManager.enqueue(
-                        OneTimeWorkRequestBuilder<SecureSettingsWorker>().build()
-                    )
-
-                    Toast.makeText(context, "Task enqueued", Toast.LENGTH_SHORT).show()
-
-                    // wait
-                    Thread.sleep(4000)
-                    batteryState = manager.getChargingMode(context.contentResolver)
-                }
-
-            ) {
-                CategoryTitle(
-                    title = R.string.schedule
-                )
-            }
-
-            Schedule(
-                daysSelected = schedule, onDaysSelected = {
-                    manager.setSchedule(context, it)
-                    schedule = it
-                }, leadingText = context.getString(
-                    R.string.schedule_title, context.getString(
-                        when (getBatteryStateOpposite(defaultMode ?: BatteryState.Unknown)) {
-                            BatteryState.Adaptive -> R.string.adaptive_charging_enabled
-                            BatteryState.Limited -> R.string.charge_optimization_mode
-                            BatteryState.Unknown -> R.string.unknown
-                            null -> R.string.unknown
-                        }
-                    )
-                ), enabled = isSecureSettingsGranted
-            )
+//            Box(
+//                modifier = Modifier.clickable {
+//                    // enqueue temp task to test
+//                    val workManager = WorkManager.getInstance(context)
+//                    workManager.enqueue(
+//                        OneTimeWorkRequestBuilder<SecureSettingsWorker>().build()
+//                    )
+//
+//                    Toast.makeText(context, "Task enqueued", Toast.LENGTH_SHORT).show()
+//
+//                    // wait
+//                    Thread.sleep(4000)
+//                    batteryState = manager.getChargingMode(context.contentResolver)
+//                }
+//
+//            ) {
+//                CategoryTitle(
+//                    title = R.string.schedule
+//                )
+//            }
+//
+//            Schedule(
+//                daysSelected = schedule, onDaysSelected = {
+//                    manager.setSchedule(context, it)
+//                    schedule = it
+//                }, leadingText = context.getString(
+//                    R.string.schedule_title, context.getString(
+//                        when (getBatteryStateOpposite(defaultMode ?: BatteryState.Unknown)) {
+//                            BatteryState.Adaptive -> R.string.adaptive_charging_enabled
+//                            BatteryState.Limited -> R.string.charge_optimization_mode
+//                            BatteryState.Unknown -> R.string.unknown
+//                            null -> R.string.unknown
+//                        }
+//                    )
+//                ), enabled = isSecureSettingsGranted
+//            )
         }
     }
 }
@@ -614,7 +633,7 @@ fun ChargingModePage(navigator: DestinationsNavigator) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination<MainGraph>
 @Composable
-fun ModePage(navigator: DestinationsNavigator, mode: String? = null) {
+fun ModePage(navigator: DestinationsNavigator, mode: Int? = null) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalMainActivity.current
     val secureSettingsGranted = LocalSecureSettingsGranted.current
@@ -637,8 +656,8 @@ fun ModePage(navigator: DestinationsNavigator, mode: String? = null) {
                 name = "",
                 settings = emptyList(),
                 scheduledTime = null,
-                scheduleDays = listOf(false, false, false, false, false, false, false),
-                )
+                scheduleDays = listOf(false, false, false, false, false, false, false)
+            )
         )
     }
     var settings by remember {
@@ -653,13 +672,15 @@ fun ModePage(navigator: DestinationsNavigator, mode: String? = null) {
     var scheduledTime by remember { mutableStateOf<LocalDateTime?>(null) }
     LaunchedEffect(Unit) {
         // get scheduled time from work manager
-        val workManager = WorkManager.getInstance(context)
-        val workInfo = workManager.getWorkInfosByTag("mode_${mode.id}").get()
-        if (workInfo.isNotEmpty()) {
-            scheduledTime = workInfo[0].run {
-                val timeZone = ZoneId.systemDefault() // Use the system's default time zone
+        if(_mode != null){
+            val workManager = WorkManager.getInstance(context)
+            val workInfo = workManager.getWorkInfosByTag("mode_${mode.id}").get()
+            if (workInfo.isNotEmpty()) {
+                scheduledTime = workInfo[0].run {
+                    val timeZone = ZoneId.systemDefault() // Use the system's default time zone
 
-                LocalDateTime.ofInstant(Instant.ofEpochMilli(nextScheduleTimeMillis), timeZone)
+                    LocalDateTime.ofInstant(Instant.ofEpochMilli(nextScheduleTimeMillis), timeZone)
+                }
             }
         }
     }

@@ -45,7 +45,7 @@ class ModeScheduleManager(
     }
 
     private fun createWorkRequest(
-        modeId: String,
+        modeId: Int,
         timeMinutes: LocalTime,
         scheduleDays: List<Boolean>,
         forceNextDay: Boolean = false
@@ -86,7 +86,7 @@ class ModeScheduleManager(
             .build()
     }
 
-    fun cancelSchedule(modeId: String) {
+    fun cancelSchedule(modeId: Int) {
         workManager.cancelUniqueWork("mode_$modeId")
     }
 }
@@ -102,9 +102,9 @@ class ModeWorker(
                 return Result.failure()
             }
 
-            val modeId = inputData.getString("mode_id")
+            val modeId = inputData.getInt("mode_id", -1)
 
-            if (modeId == null) {
+            if (modeId == -1) {
                 Log.e("ModeWorker", "Mode ID not found. Failing the worker.")
                 return Result.failure()
             }
